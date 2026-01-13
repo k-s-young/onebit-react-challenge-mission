@@ -1,11 +1,11 @@
 import "./TransactionEditor.css";
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { TransactionDispatchContext } from '../App';
 import { useNavigate } from 'react-router-dom';
 
 const categories = ["🍚 식비", "💧 구독", "🏠 생활", "🏢 급여", "💰 금융"];
 
-export default function TransactionEditor() {
+export default function TransactionEditor({initData, onSubmit}) {
   const { onCreateTransaction } = useContext(TransactionDispatchContext);
   const nav = useNavigate();
   const [input, setInput] = useState({
@@ -17,6 +17,15 @@ export default function TransactionEditor() {
   });
   const { type, name, amount, category, date } = input;
 
+  useEffect(() => {
+    if(initData) {
+      setInput({
+        ...initData,
+        date: new Date(initData.date).toISOString().split("T")[0],
+      });
+    }
+  }, [initData]);
+
   const onChangeInput = (e) => {
     setInput({
       ...input,
@@ -24,15 +33,10 @@ export default function TransactionEditor() {
     });
   }
 
-  const onSubmit = () => {
-    if(name === "" || amount === 0 || category === "" || date === "") {
-      alert("모든 필드를 입력해주세요");
-      return;
-    }
-    onCreateTransaction(name, amount, type, category, date);
+  const onClickSubmit = () => {
+    onSubmit(input);
     nav("/", { replace: true });
   }
-
 
   return (
     <div className="TransactionEditor">
@@ -94,7 +98,7 @@ export default function TransactionEditor() {
         />
       </div>
       <div className="button_container">
-        <button className="submit_button" onClick={onSubmit}>저장</button>
+        <button className="submit_button" onClick={onClickSubmit}>저장</button>
         <button className="cancel_button" onClick={() => nav(-1)}>취소</button>
       </div>
     </div>
