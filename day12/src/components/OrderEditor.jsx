@@ -1,22 +1,30 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 const OrderEditor = () => {
-  const [menu, setMenu] = useState('')
-  const [address, setAddress] = useState('')
-  const [request, setRequest] = useState('')
+  const [input, setInput] = useState({
+    menu: '',
+    address: '',
+    request: '',
+  })
 
-  const onChangeMenu = (e) => {
-    setMenu(e.target.value)
+  const addressRef = useRef();
+
+  const onChangeInput = (e) => {
+    setInput({
+      ...input,
+      [e.target.name]: e.target.value,
+    })
   }
-  const onChangeAddress = (e) => {
-    setAddress(e.target.value)
-  }
-  const onChangeRequest = (e) => {
-    setRequest(e.target.value)
-  }
+
+  const { menu, address, request } = input;
 
   const onSubmit = () => {
-    alert(`주문 완료되었습니다.\n메뉴: ${menu}\n주소: ${address}\n배달 요청사항: ${request}`)
+    if(!addressRef.current.value) {
+      addressRef.current.focus();
+      return;
+    }
+
+    alert(`주문 완료되었습니다.\n메뉴: ${menu}\n주소: ${address}\n배달 요청사항: ${request}`);
   }
 
   return (
@@ -28,7 +36,7 @@ const OrderEditor = () => {
         <div style={{ marginBottom: 5, fontSize: 14 }}>
           메뉴 선택
         </div>
-        <select style={{ width: 300, padding: 5 }} onChange={onChangeMenu} value={menu}>
+        <select style={{ width: 300, padding: 5 }} onChange={onChangeInput} value={menu} name="menu">
           <option value={"족발"}>족발</option>
           <option value={"떡볶이"}>떡볶이</option>
           <option value={"아이스크림"}>아이스크림</option>
@@ -40,8 +48,10 @@ const OrderEditor = () => {
           배달 주소
         </div>
         <input
-          onChange={onChangeAddress}
+          ref={addressRef}
+          onChange={onChangeInput}
           value={address}
+          name="address"
           style={{ width: 300, padding: 5 }}
           placeholder="주소) 서울특별시 xx동 .."
         />
@@ -51,8 +61,9 @@ const OrderEditor = () => {
           배달 요청사항
         </div>
         <textarea
-          onChange={onChangeRequest}
+          onChange={onChangeInput}
           value={request}
+          name="request"
           style={{ width: 300, padding: 5 }}
           placeholder="배달 요청사항을 써 주세요..."
         />
