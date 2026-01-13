@@ -1,7 +1,7 @@
 import "./ContactEditor.css";
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
-export default function ContactEditor({ onCreate }) {
+function ContactEditor({ onCreate }) {
   const [contact, setContact] = useState({
     name: '',
     email: '',
@@ -46,3 +46,7 @@ export default function ContactEditor({ onCreate }) {
     </div>
   );
 }
+
+const MemoizedContactEditor = memo(ContactEditor);
+
+export default MemoizedContactEditor;
