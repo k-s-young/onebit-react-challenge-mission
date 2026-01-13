@@ -2,18 +2,19 @@ import "./Home.css";
 import { useContext } from 'react';
 import { TransactionStateContext } from '../App';
 import TransactionItem from "../components/TransactionItem";
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const transactions = useContext(TransactionStateContext);
-
   const sortedTransactions = transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+  const nav = useNavigate();
 
   return (
     <div className="Home">
       <header>
         <h1>한입 가계부</h1>
-        <div className="new_button">+ 작성하기</div>
+        <button className="new_button" onClick={() => nav("/new-transaction")}>+ 작성하기</button>
       </header>
       <main className="transaction_list">
         {sortedTransactions.map((transaction) => (
