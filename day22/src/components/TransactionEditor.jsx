@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 const categories = ["🍚 식비", "💧 구독", "🏠 생활", "🏢 급여", "💰 금융"];
 
-export default function TransactionEditor({initData, onSubmit}) {
-  const { onCreateTransaction } = useContext(TransactionDispatchContext);
+export default function TransactionEditor({type, initData}) {
+  const { onCreateTransaction, onUpdateTransaction } = useContext(TransactionDispatchContext);
   const nav = useNavigate();
   const [input, setInput] = useState({
     type: "expense",
@@ -15,16 +15,15 @@ export default function TransactionEditor({initData, onSubmit}) {
     category: categories[0],
     date: new Date().toISOString().split("T")[0],
   });
-  const { type, name, amount, category, date } = input;
 
   useEffect(() => {
-    if(initData) {
+    if(type === "EDIT" && initData) {
       setInput({
         ...initData,
         date: new Date(initData.date).toISOString().split("T")[0],
       });
     }
-  }, [initData]);
+  }, [type, initData]);
 
   const onChangeInput = (e) => {
     setInput({
@@ -33,8 +32,17 @@ export default function TransactionEditor({initData, onSubmit}) {
     });
   }
 
-  const onClickSubmit = () => {
-    onSubmit(input);
+  const onSubmit = () => {
+    if (!input.name || !input.amount || !input.category || !input.date) {
+      alert("모든 필드를 입력해주세요");
+      return;
+    }
+
+    if(type === "NEW") {
+      onCreateTransaction(input.name, input.amount, input.type, input.category, input.date);
+    } else {
+      onUpdateTransaction(initData.id, input.name, input.amount, input.type, input.category, input.date);
+    }
     nav("/", { replace: true });
   }
 
@@ -44,7 +52,7 @@ export default function TransactionEditor({initData, onSubmit}) {
         <div className="description">분류</div>
         <select 
           name="type" 
-          value={type}
+          value={input.type}
           onChange={onChangeInput}
         >
           <option value="expense">지출</option>
@@ -58,7 +66,7 @@ export default function TransactionEditor({initData, onSubmit}) {
           id="name"
           placeholder="지출 & 수입 이름을 입력하세요 ..."
           name="name"
-          value={name}
+          value={input.name}
           onChange={onChangeInput}
         />
       </div>
@@ -69,7 +77,7 @@ export default function TransactionEditor({initData, onSubmit}) {
           id="amount"
           placeholder="금액을 입력하세요"
           name="amount"
-          value={amount}
+          value={input.amount}
           onChange={onChangeInput}
         />
       </div>
@@ -77,7 +85,7 @@ export default function TransactionEditor({initData, onSubmit}) {
         <div className="description">카테고리</div>
         <select
           name="category"
-          value={category}
+          value={input.category}
           onChange={onChangeInput}
         >
           {categories.map((category) => (
@@ -93,12 +101,12 @@ export default function TransactionEditor({initData, onSubmit}) {
           type="date"
           id="date"
           name="date"
-          value={date}
+          value={input.date}
           onChange={onChangeInput} 
         />
       </div>
       <div className="button_container">
-        <button className="submit_button" onClick={onClickSubmit}>저장</button>
+        <button className="submit_button" onClick={onSubmit}>저장</button>
         <button className="cancel_button" onClick={() => nav(-1)}>취소</button>
       </div>
     </div>
